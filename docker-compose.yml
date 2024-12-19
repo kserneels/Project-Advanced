@@ -1,0 +1,88 @@
+services:
+  mongo-cars:
+    image: mongo:latest
+    ports:
+      - 27017:27017
+    volumes:
+      - mongodb_car_data:/data/db
+
+  mysql-carhire:
+    image: mysql:latest
+    ports:
+      - 3308:3306
+    volumes:
+      - mysql_carhire_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: abc123
+
+  mysql-customer:
+    image: mysql:latest
+    ports:
+      - 3307:3306
+    volumes:
+      - mysql_inventory_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: abc123
+
+  car-service:
+    depends_on:
+      - mongo-cars
+    image: KenzoS/car-service
+    ports:
+      - 8080:8080
+    links:
+      - mongo-cars
+    environment:
+      MONGODB_PORT: 27017
+      MONGODB_HOST: mongo-cars
+
+  customer-service:
+    depends_on:
+      - mysql-customer
+    image: KenzoS/customer-service
+    ports:
+      - 8082:8082
+    links:
+      - mysql-customer
+    environment:
+      MYSQL_DB_USERNAME: root
+      MYSQL_DB_PASSWORD: abc123
+      MYSQL_DB_HOST: mysql-customer
+      MYSQL_DB_PORT: 3307
+
+  carhire-service:
+    depends_on:
+      - car-service
+      - customer-service
+    image: KenzoS/carhire-service
+    ports:
+      - 8081:8081
+    links:
+      - car-service
+      - customer-service
+    environment:
+      PRODUCT_SERVICE_BASEURL: car-service:8080
+      INVENTORY_INFO_SERVICE_BASEURL: customer-service:8082
+      MYSQL_DB_USERNAME: root
+      MYSQL_DB_PASSWORD: abc123
+      MYSQL_DB_HOST: mysql-car
+      MYSQL_DB_PORT: 3306
+
+#  api-gateway:
+#    depends_on:
+#      - product-service
+#      - order-service
+#    image: miverboven/ede-api-gateway
+#    ports:
+#      - 8083:8083
+#    links:
+#      - product-service
+#      - order-service
+#    environment:
+#      PRODUCT_SERVICE_BASEURL: product-service:8080
+#      ORDER_SERVICE_BASEURL: order-service:8081
+
+volumes:
+  mongodb_car_data:
+  mysql_customer_data:
+  mysql_carhire_data:
