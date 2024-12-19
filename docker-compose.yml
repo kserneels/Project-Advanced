@@ -54,19 +54,21 @@ services:
     depends_on:
       - car-service
       - customer-service
+      - mysql-carhire
     image: KenzoS/carhire-service
     ports:
       - 8081:8081
     links:
       - car-service
       - customer-service
+      - mysql-carhire
     environment:
-      PRODUCT_SERVICE_BASEURL: car-service:8080
-      INVENTORY_INFO_SERVICE_BASEURL: customer-service:8082
       MYSQL_DB_USERNAME: root
       MYSQL_DB_PASSWORD: abc123
-      MYSQL_DB_HOST: mysql-car
-      MYSQL_DB_PORT: 3306
+      MYSQL_DB_HOST: mysql-carhire
+      MYSQL_DB_PORT: 3308
+      PRODUCT_SERVICE_BASEURL: car-service:8080
+      INVENTORY_INFO_SERVICE_BASEURL: customer-service:8082
 
 #  api-gateway:
 #    depends_on:
