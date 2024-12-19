@@ -5,6 +5,8 @@ services:
       - 27017:27017
     volumes:
       - mongodb_car_data:/data/db
+    networks:
+      - app-network
 
   mysql-carhire:
     image: mysql:latest
@@ -14,6 +16,8 @@ services:
       - mysql_carhire_data:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: abc123
+    networks:
+      - app-network
 
   mysql-customer:
     image: mysql:latest
@@ -23,7 +27,8 @@ services:
       - mysql_customer_data:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: abc123
-      MYSQL_DATABASE: customerdb
+    networks:
+      - app-network
 
   car-service:
     depends_on:
@@ -31,11 +36,11 @@ services:
     image: KenzoS/car-service
     ports:
       - 8080:8080
-    links:
-      - mongo-cars
     environment:
       MONGODB_PORT: 27017
       MONGODB_HOST: mongo-cars
+    networks:
+      - app-network
 
   customer-service:
     depends_on:
@@ -43,49 +48,36 @@ services:
     image: KenzoS/customer-service
     ports:
       - 8082:8082
-    links:
-      - mysql-customer
     environment:
       MYSQL_DB_USERNAME: root
       MYSQL_DB_PASSWORD: abc123
       MYSQL_DB_HOST: mysql-customer
       MYSQL_DB_PORT: 3307
+    networks:
+      - app-network
 
   carhire-service:
     depends_on:
-      - car-service
-      - customer-service
       - mysql-carhire
+      - customer-service
     image: KenzoS/carhire-service
     ports:
       - 8081:8081
-    links:
-      - car-service
-      - customer-service
-      - mysql-carhire
     environment:
       MYSQL_DB_USERNAME: root
       MYSQL_DB_PASSWORD: abc123
       MYSQL_DB_HOST: mysql-carhire
-      MYSQL_DB_PORT: 3308
+      MYSQL_DB_PORT: 3306
       PRODUCT_SERVICE_BASEURL: car-service:8080
       INVENTORY_INFO_SERVICE_BASEURL: customer-service:8082
-
-#  api-gateway:
-#    depends_on:
-#      - product-service
-#      - order-service
-#    image: miverboven/ede-api-gateway
-#    ports:
-#      - 8083:8083
-#    links:
-#      - product-service
-#      - order-service
-#    environment:
-#      PRODUCT_SERVICE_BASEURL: product-service:8080
-#      ORDER_SERVICE_BASEURL: order-service:8081
+    networks:
+      - app-network
 
 volumes:
   mongodb_car_data:
   mysql_customer_data:
   mysql_carhire_data:
+
+networks:
+  app-network:
+    driver: bridge
