@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  # MongoDB for car-service (This is working fine, no changes here)
+  # MongoDB for car-service (No changes)
   mongo-cars:
     image: mongo:latest
     ports:
@@ -35,7 +35,7 @@ services:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       retries: 5
       interval: 30s
-      start_period: 40s  # Increased start period to give MySQL more time to initialize
+      start_period: 60s  # Increased to 60 seconds to ensure MySQL has time to initialize
       timeout: 5s
 
   # MySQL for customer service
@@ -56,7 +56,7 @@ services:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       retries: 5
       interval: 30s
-      start_period: 40s  # Increased start period to give MySQL more time to initialize
+      start_period: 60s  # Increased to 60 seconds to ensure MySQL has time to initialize
       timeout: 5s
 
   # Car Service (Depends on MongoDB)
@@ -71,7 +71,6 @@ services:
       MONGODB_HOST: mongo-cars
     networks:
       - app-network
-    # No entrypoint modification needed here since MongoDB is working fine
 
   # Customer Service (Depends on MySQL Customer)
   customer-service:
