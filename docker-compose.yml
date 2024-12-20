@@ -1,7 +1,6 @@
-version: '3.8'
+version: "3.8"
 
 services:
-  # MongoDB for car-service (No changes)
   mongo-cars:
     image: mongo:latest
     ports:
@@ -17,7 +16,6 @@ services:
       start_period: 10s
       timeout: 10s
 
-  # MySQL for carhire service
   mysql-carhire:
     image: mysql:latest
     ports:
@@ -35,10 +33,9 @@ services:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       retries: 5
       interval: 30s
-      start_period: 60s  # Increased to 60 seconds to ensure MySQL has time to initialize
+      start_period: 60s
       timeout: 5s
 
-  # MySQL for customer service
   mysql-customer:
     image: mysql:latest
     ports:
@@ -56,10 +53,9 @@ services:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       retries: 5
       interval: 30s
-      start_period: 60s  # Increased to 60 seconds to ensure MySQL has time to initialize
+      start_period: 60s
       timeout: 5s
 
-  # Car Service (Depends on MongoDB)
   car-service:
     depends_on:
       - mongo-cars
@@ -72,7 +68,6 @@ services:
     networks:
       - app-network
 
-  # Customer Service (Depends on MySQL Customer)
   customer-service:
     depends_on:
       mysql-customer:
@@ -88,7 +83,6 @@ services:
     networks:
       - app-network
 
-  # Carhire Service (Depends on MySQL Carhire and Customer Service)
   carhire-service:
     depends_on:
       mysql-carhire:
