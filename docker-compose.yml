@@ -83,6 +83,6 @@ services:
 #      ORDER_SERVICE_BASEURL: order-service:8081
 
 volumes:
-  mongodb_car_data:
+  mongodb_cars_data:
   mysql_customer_data:
   mysql_carhire_data:
