@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   mongo-cars:
     image: mongo:latest
@@ -61,28 +63,40 @@ services:
       - car-service
       - customer-service
     environment:
-      CAR_SERVICE_BASEURL: car-service:8080
+      CAR_SERVICE_BASEURL: car-service:8081
       CUSTOMER_INFO_SERVICE_BASEURL: customer-service:8082
       MYSQL_DB_USERNAME: root
       MYSQL_DB_PASSWORD: abc123
       MYSQL_DB_HOST: mysql-carhire
       MYSQL_DB_PORT: 3306
 
-#  api-gateway:
-#    depends_on:
-#      - car-service
-#      - carhire-service
-#    image: kenzos/api-gateway
-#    ports:
-#      - 8084:8084
-#    links:
-#      - car-service
-#      - carhire-service
-#    environment:
-#      CAR_SERVICE_BASEURL: car-service:8081
-#      _SERVICE_BASEURL: carhire-service:8083
+  api-gateway:
+    depends_on:
+      - car-service
+      - carhire-service
+    image: kenzos/api-gateway
+    ports:
+      - 8084:8084
+    links:
+      - car-service
+      - carhire-service
+    environment:
+      CAR_SERVICE_BASEURL: car-service:8081
+      _SERVICE_BASEURL: carhire-service:8083
+
+  keycloak:
+    image: kenzos/keycloak:latest
+    environment:
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: admin
+    ports:
+      - "8085:8080"
+    volumes:
+      - keycloak_data:/opt/keycloak/data
+    restart: unless-stopped
 
 volumes:
   mongodb_cars_data:
   mysql_customer_data:
   mysql_carhire_data:
+  keycloak_data:

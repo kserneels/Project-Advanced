@@ -1,6 +1,9 @@
 name: Build and deliver containers
 
-on: push
+on:
+  push:
+    branches:
+      - main  # Of welke branch je ook gebruikt
 
 jobs:
   car-service:
@@ -29,6 +32,7 @@ jobs:
 
       - name: Upload container to Docker Hub with Push
         run: docker push ${{ secrets.DOCKER_USER }}/car-service:latest
+
   customer-service:
     runs-on: ubuntu-latest
     name: Java 17 build, test, deliver customer-service container
@@ -55,6 +59,7 @@ jobs:
 
       - name: Upload container to Docker Hub with Push
         run: docker push ${{ secrets.DOCKER_USER }}/customer-service:latest
+
   carhire-service:
     runs-on: ubuntu-latest
     name: Java 17 build, test, deliver carhire-service container
@@ -81,29 +86,48 @@ jobs:
 
       - name: Upload container to Docker Hub with Push
         run: docker push ${{ secrets.DOCKER_USER }}/carhire-service:latest
-#  apigateway:
-#    runs-on: ubuntu-latest
-#    name: Java 17 build, test, deliver ede-api-gateway container
-#    steps:
-#      - name: Check out repository
-#        uses: actions/checkout@v3
-#
-#      - name: Set up JDK 17
-#        uses: actions/setup-java@v3
-#        with:
-#          java-version: 17
-#          cache: maven
-#          distribution: adopt
-#
-#      - name: Build, test and package project
-#        working-directory: ./api-gateway
-#        run: mvn package -B -DskipTests
-#
-#      - name: Docker login
-#        run: docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASSWORD }}
-#
-#      - name: Docker Build
-#        run: docker build --build-arg GOOGLE_CLIENTID=${{ secrets.GOOGLE_CLIENTID }} --build-arg GOOGLE_CLIENTSECRET=${{ secrets.GOOGLE_CLIENTSECRET }} -t ${{ secrets.DOCKER_USER }}/ede-api-gateway:latest ./api-gateway
-#
-#      - name: Upload container to Docker Hub with Push
-#        run: docker push ${{ secrets.DOCKER_USER }}/api-gateway:latest
+
+  # Toevoegen van Keycloak job
+  keycloak:
+    runs-on: ubuntu-latest
+    name: Build, test, deliver keycloak container
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Docker login
+        run: docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Docker Build
+        run: docker build -t ${{ secrets.DOCKER_USER }}/keycloak:latest ./keycloak
+
+      - name: Upload container to Docker Hub with Push
+        run: docker push ${{ secrets.DOCKER_USER }}/keycloak:latest
+
+  # Toevoegen van API Gateway job
+  api-gateway:
+    runs-on: ubuntu-latest
+    name: Java 17 build, test, deliver api-gateway container
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: 17
+          cache: maven
+          distribution: adopt
+
+      - name: Build, test and package project
+        working-directory: ./api-gateway
+        run: mvn package -B -DskipTests
+
+      - name: Docker login
+        run: docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Docker Build
+        run: docker build --build-arg GOOGLE_CLIENTID=${{ secrets.GOOGLE_CLIENTID }} --build-arg GOOGLE_CLIENTSECRET=${{ secrets.GOOGLE_CLIENTSECRET }} -t ${{ secrets.DOCKER_USER }}/api-gateway:latest ./api-gateway
+
+      - name: Upload container to Docker Hub with Push
+        run: docker push ${{ secrets.DOCKER_USER }}/api-gateway:latest
