@@ -8,6 +8,9 @@ services:
       - 27017:27017
     volumes:
       - mongodb_cars_data:/data/db
+    environment:
+      MONGODB_HOST: MongoCar
+      MONGODB_PORT: 27017
 
   # MySQL container voor CarHire Service
   MysqlCarHire:
@@ -18,7 +21,7 @@ services:
       - mysql_carhire_data:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: abc123
-      MYSQL_DATABASE: carhiredb  # Database voor carhire-service
+      MYSQL_DATABASE: carhiredb  # Nieuwe naam voor CarHire database
 
   # MySQL container voor Customer Service
   MysqlCustomer:
@@ -29,58 +32,58 @@ services:
       - mysql_customer_data:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: abc123
-      MYSQL_DATABASE: customer-service  # Database voor customer-service
+      MYSQL_DATABASE: customerdb  # Nieuwe naam voor Customer database
 
   # Car Service afhankelijk van MongoDB
   car-service:
     depends_on:
-      - MongoCar  # Verbindt met de MongoDB container
+      - MongoCar
     image: kenzos/car-service
     ports:
       - 8081:8081
     environment:
-      MONGODB_HOST: MongoCar  # Verbind met MongoDB via containernaam
+      MONGODB_HOST: MongoCar
       MONGODB_PORT: 27017
-    command: ["./wait-for-it.sh", "MongoCar:27017", "--", "java", "-jar", "app.jar"]  # Wacht op MongoDB
+    command: ["java", "-jar", "app.jar"]
 
   # Customer Service afhankelijk van MySQL Customer
   customer-service:
     depends_on:
-      - MysqlCustomer  # Verbindt met de MySQL Customer container
+      - MysqlCustomer
     image: kenzos/customer-service
     ports:
       - 8082:8082
     environment:
-      MYSQL_DB_HOST: MysqlCustomer  # Verbind met MySQL via containernaam
+      MYSQL_DB_HOST: MysqlCustomer  # Verbindt met de nieuwe MySQL containernaam
       MYSQL_DB_PORT: 3306
-    command: ["./wait-for-it.sh", "MysqlCustomer:3306", "--", "java", "-jar", "app.jar"]  # Wacht op MySQL
+    command: ["java", "-jar", "app.jar"]
 
   # CarHire Service afhankelijk van Car Service en Customer Service
   carhire-service:
     depends_on:
-      - car-service  # Verbindt met de Car Service
-      - customer-service  # Verbindt met de Customer Service
+      - car-service
+      - customer-service
     image: kenzos/carhire-service
     ports:
       - 8083:8083
     environment:
-      CAR_SERVICE_BASEURL: car-service:8081  # Base URL voor car-service
-      CUSTOMER_INFO_SERVICE_BASEURL: customer-service:8082  # Base URL voor customer-service
-      MYSQL_DB_HOST: MysqlCarHire  # Verbindt met MySQL via containernaam
+      CAR_SERVICE_BASEURL: car-service:8081
+      CUSTOMER_INFO_SERVICE_BASEURL: customer-service:8082
+      MYSQL_DB_HOST: MysqlCarHire  # Verbindt met de nieuwe MySQL containernaam
       MYSQL_DB_PORT: 3306
-    command: ["./wait-for-it.sh", "MysqlCarHire:3306", "--", "java", "-jar", "app.jar"]  # Wacht op MySQL
+    command: ["java", "-jar", "app.jar"]
 
   # API Gateway afhankelijk van Car Service en CarHire Service
   api-gateway:
     depends_on:
-      - car-service  # Verbindt met de Car Service
-      - carhire-service  # Verbindt met de CarHire Service
+      - car-service
+      - carhire-service
     image: kenzos/api-gateway
     ports:
       - 8084:8084
     environment:
-      CAR_SERVICE_BASEURL: car-service:8081  # Base URL voor car-service
-      CARHIRE_SERVICE_BASEURL: carhire-service:8083  # Base URL voor carhire-service
+      CAR_SERVICE_BASEURL: car-service:8081
+      CARHIRE_SERVICE_BASEURL: carhire-service:8083
 
   # Keycloak voor authenticatie
   keycloak:
