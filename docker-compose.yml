@@ -16,6 +16,7 @@ services:
       - mysql_carhire_data:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: abc123
+      MYSQL_DATABASE: carhiredb  # De database voor carhire-service
 
   mysql-customer:
     image: mysql:8.0.39
@@ -25,6 +26,7 @@ services:
       - mysql_customer_data:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: abc123
+      MYSQL_DATABASE: customer-service  # De database voor customer-service
 
   car-service:
     depends_on:
@@ -35,6 +37,7 @@ services:
     environment:
       MONGODB_HOST: mongo-cars
       MONGODB_PORT: 27017
+    command: ["./wait-for-it.sh", "mongo-cars:27017", "--", "java", "-jar", "app.jar"]  # Wachten op MongoDB
 
   customer-service:
     depends_on:
@@ -45,6 +48,7 @@ services:
     environment:
       MYSQL_DB_HOST: mysql-customer
       MYSQL_DB_PORT: 3306
+    command: ["./wait-for-it.sh", "mysql-customer:3306", "--", "java", "-jar", "app.jar"]  # Wachten op MySQL
 
   carhire-service:
     depends_on:
@@ -58,6 +62,7 @@ services:
       CUSTOMER_INFO_SERVICE_BASEURL: customer-service:8082
       MYSQL_DB_HOST: mysql-carhire
       MYSQL_DB_PORT: 3306
+    command: ["./wait-for-it.sh", "mysql-carhire:3306", "--", "java", "-jar", "app.jar"]
 
   api-gateway:
     depends_on:
