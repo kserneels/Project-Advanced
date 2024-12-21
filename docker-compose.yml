@@ -44,7 +44,6 @@ services:
     environment:
       MONGODB_HOST: MongoCar
       MONGODB_PORT: 27017
-    command: ["java", "-jar", "app.jar"]
 
   # Customer Service afhankelijk van MySQL Customer
   customer-service:
@@ -56,7 +55,6 @@ services:
     environment:
       MYSQL_DB_HOST: MysqlCustomer  # Verbindt met de nieuwe MySQL containernaam
       MYSQL_DB_PORT: 3306
-    command: ["java", "-jar", "app.jar"]
 
   # CarHire Service afhankelijk van Car Service en Customer Service
   carhire-service:
@@ -71,7 +69,6 @@ services:
       CUSTOMER_INFO_SERVICE_BASEURL: customer-service:8082
       MYSQL_DB_HOST: MysqlCarHire  # Verbindt met de nieuwe MySQL containernaam
       MYSQL_DB_PORT: 3306
-    command: ["java", "-jar", "app.jar"]
 
   # API Gateway afhankelijk van Car Service en CarHire Service
   api-gateway:
