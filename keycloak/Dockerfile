@@ -9,7 +9,7 @@ ENV KEYCLOAK_PASSWORD=admin
 ENV KEYCLOAK_HTTP_PORT=8085
 
 # Expose de aangepaste poort
-EXPOSE 8085 8443
+EXPOSE 8085 8085
 
 # Start Keycloak in ontwikkelmodus
 ENTRYPOINT ["/opt/keycloak/bin/kc.sh", "start-dev"]
