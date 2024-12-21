@@ -70,20 +70,20 @@ services:
       MYSQL_DB_HOST: MysqlCarHire  # Verbindt met de nieuwe MySQL containernaam
       MYSQL_DB_PORT: 3306
 
-#  # API Gateway afhankelijk van Car Service en CarHire Service
-#  api-gateway:
-#    depends_on:
-#      - car-service
-#      - carhire-service
-#    image: kenzos/api-gateway
-#    ports:
-#      - 8084:8084
-#    links:
-#      - car-service
-#      - carhire-service
-##    environment:
-##      CAR_SERVICE_BASEURL: car-service:8081
-##      CARHIRE_SERVICE_BASEURL: carhire-service:8083
+  # API Gateway afhankelijk van Car Service en CarHire Service
+  api-gateway:
+    depends_on:
+      - car-service
+      - carhire-service
+    image: kenzos/api-gateway
+    ports:
+      - 8084:8084
+    links:
+      - car-service
+      - carhire-service
+#    environment:
+#      CAR_SERVICE_BASEURL: car-service:8081
+#      CARHIRE_SERVICE_BASEURL: carhire-service:8083
 
   # Keycloak voor authenticatie
   keycloak:
