@@ -45,7 +45,7 @@ services:
     links:
       - mysql-customer
     environment:
-      MYSQL_DB_USERNAME: sa
+      MYSQL_DB_USERNAME: root
       MYSQL_DB_PASSWORD: abc123
       MYSQL_DB_HOST: mysql-customer
       MYSQL_DB_PORT: 3306
