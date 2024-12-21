@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # MongoDB container voor Car Service
   MongoCar:
@@ -8,31 +6,26 @@ services:
       - 27017:27017
     volumes:
       - mongodb_cars_data:/data/db
-    environment:
-      MONGODB_HOST: MongoCar
-      MONGODB_PORT: 27017
 
   # MySQL container voor CarHire Service
   MysqlCarHire:
-    image: mysql:8.0.39
+    image: mysql:latest
     ports:
       - 3308:3306
     volumes:
       - mysql_carhire_data:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: abc123
-      MYSQL_DATABASE: carhiredb  # Nieuwe naam voor CarHire database
 
   # MySQL container voor Customer Service
   MysqlCustomer:
-    image: mysql:8.0.39
+    image: mysql:latest
     ports:
       - 3307:3306
     volumes:
       - mysql_customer_data:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: abc123
-      MYSQL_DATABASE: customerdb  # Nieuwe naam voor Customer database
 
   # Car Service afhankelijk van MongoDB
   car-service:
@@ -41,6 +34,8 @@ services:
     image: kenzos/car-service
     ports:
       - 8081:8081
+    links:
+      -MongoCar
     environment:
       MONGODB_HOST: MongoCar
       MONGODB_PORT: 27017
@@ -64,23 +59,31 @@ services:
     image: kenzos/carhire-service
     ports:
       - 8083:8083
+    links:
+      - car-service
+      - customer-service
     environment:
       CAR_SERVICE_BASEURL: car-service:8081
       CUSTOMER_INFO_SERVICE_BASEURL: customer-service:8082
+      MYSQL_DBUSERNAME: root
+      MYSQL_DB_PASSWORD: abc123
       MYSQL_DB_HOST: MysqlCarHire  # Verbindt met de nieuwe MySQL containernaam
       MYSQL_DB_PORT: 3306
 
-  # API Gateway afhankelijk van Car Service en CarHire Service
-  api-gateway:
-    depends_on:
-      - car-service
-      - carhire-service
-    image: kenzos/api-gateway
-    ports:
-      - 8084:8084
-    environment:
-      CAR_SERVICE_BASEURL: car-service:8081
-      CARHIRE_SERVICE_BASEURL: carhire-service:8083
+#  # API Gateway afhankelijk van Car Service en CarHire Service
+#  api-gateway:
+#    depends_on:
+#      - car-service
+#      - carhire-service
+#    image: kenzos/api-gateway
+#    ports:
+#      - 8084:8084
+#    links:
+#      - car-service
+#      - carhire-service
+##    environment:
+##      CAR_SERVICE_BASEURL: car-service:8081
+##      CARHIRE_SERVICE_BASEURL: carhire-service:8083
 
   # Keycloak voor authenticatie
   keycloak:
@@ -89,7 +92,7 @@ services:
       KEYCLOAK_USER: admin
       KEYCLOAK_PASSWORD: admin
     ports:
-      - "8085:8080"
+      - "8085:8085"
     volumes:
       - keycloak_data:/opt/keycloak/data
     restart: unless-stopped

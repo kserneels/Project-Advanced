@@ -1,51 +1,137 @@
-name: Build and push Docker images
+name: Build and deliver containers
 
-on:
-  push:
-    branches:
-      - main
+on: push
 
 jobs:
-  build:
+  carservice:
     runs-on: ubuntu-latest
+    name: Java 17 build, test, deliver product-service container
     steps:
-      - name: Checkout repository
+      - name: Check out repository
         uses: actions/checkout@v3
 
-      - name: Log in to Docker Hub
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: 17
+          cache: maven
+          distribution: adopt
+
+      - name: Build, test and package project
+        working-directory: ./car-service
+        run: mvn package -B
+
+      - name: Docker login
         run: docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASSWORD }}
 
-      # Bouw de car-service image
-      - name: Build car-service Docker image
-        run: docker build -t ${{ secrets.DOCKER_USER }}/car-service:latest ./car-service
+      - name: Docker Build
+        run: docker build -t ${{ secrets.DOCKER_USER }}/product-service:latest ./car-service
 
-      - name: Push car-service Docker image
+      - name: Upload container to Docker Hub with Push
         run: docker push ${{ secrets.DOCKER_USER }}/car-service:latest
+  customerservice:
+    runs-on: ubuntu-latest
+    name: Java 17 build, test, deliver customer-service container
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
 
-      # Bouw de customer-service image
-      - name: Build customer-service Docker image
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: 17
+          cache: maven
+          distribution: adopt
+
+      - name: Build, test and package project
+        working-directory: ./customer-service
+        run: mvn package -B
+
+      - name: Docker login
+        run: docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Docker Build
         run: docker build -t ${{ secrets.DOCKER_USER }}/customer-service:latest ./customer-service
 
-      - name: Push customer-service Docker image
+      - name: Upload container to Docker Hub with Push
         run: docker push ${{ secrets.DOCKER_USER }}/customer-service:latest
+  carhireservice:
+    runs-on: ubuntu-latest
+    name: Java 17 build, test, deliver carhire-service container
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
 
-      # Bouw de carhire-service image
-      - name: Build carhire-service Docker image
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: 17
+          cache: maven
+          distribution: adopt
+
+      - name: Build, test and package project
+        working-directory: ./carhire-service
+        run: mvn package -B
+
+      - name: Docker login
+        run: docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Docker Build
         run: docker build -t ${{ secrets.DOCKER_USER }}/carhire-service:latest ./carhire-service
 
-      - name: Push carhire-service Docker image
+      - name: Upload container to Docker Hub with Push
         run: docker push ${{ secrets.DOCKER_USER }}/carhire-service:latest
 
-      # Bouw de api-gateway image
-      - name: Build api-gateway Docker image
-        run: docker build -t ${{ secrets.DOCKER_USER }}/api-gateway:latest ./api-gateway
+  keycloak:
+    runs-on: ubuntu-latest
+    name: Java 17 build, test, deliver ede-api-gateway container
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
 
-      - name: Push api-gateway Docker image
-        run: docker push ${{ secrets.DOCKER_USER }}/api-gateway:latest
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: 17
+          cache: maven
+          distribution: adopt
 
-      # Bouw de keycloak image
-      - name: Build keycloak Docker image
+      - name: Build, test and package project
+        working-directory: ./keycloak
+        run: mvn package -B -DskipTests
+
+      - name: Docker login
+        run: docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Docker Build
         run: docker build -t ${{ secrets.DOCKER_USER }}/keycloak:latest ./keycloak
 
-      - name: Push keycloak Docker image
+      - name: Upload container to Docker Hub with Push
         run: docker push ${{ secrets.DOCKER_USER }}/keycloak:latest
+
+#  apigateway:
+#    runs-on: ubuntu-latest
+#    name: Java 17 build, test, deliver api-gateway container
+#    steps:
+#      - name: Check out repository
+#        uses: actions/checkout@v3
+#
+#      - name: Set up JDK 17
+#        uses: actions/setup-java@v3
+#        with:
+#          java-version: 17
+#          cache: maven
+#          distribution: adopt
+#
+#      - name: Build, test and package project
+#        working-directory: ./api-gateway
+#        run: mvn package -B -DskipTests
+#
+#      - name: Docker login
+#        run: docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASSWORD }}
+#
+#      - name: Docker Build
+#        run: docker build --build-arg GOOGLE_CLIENTID=${{ secrets.GOOGLE_CLIENTID }} --build-arg GOOGLE_CLIENTSECRET=${{ secrets.GOOGLE_CLIENTSECRET }} -t ${{ secrets.DOCKER_USER }}/ede-api-gateway:latest ./api-gateway
+#
+#      - name: Upload container to Docker Hub with Push
+#        run: docker push ${{ secrets.DOCKER_USER }}/ede-api-gateway:latest
