@@ -1,0 +1,64 @@
+server:
+  port: 8084
+
+logging:
+  level:
+    root: INFO
+    org.springframework.cloud.gateway: INFO
+    org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator: INFO
+    reactor.netty: INFO
+    org.springframework.security: TRACE
+
+spring:
+  application:
+    name: CAR-GATEWAY
+
+  cloud:
+    gateway:
+      routes:
+        # Route for Cars service (public access for all cars)
+        - id: car-service-all
+          uri: http://localhost:8081  # Direct URL to the CarService (no Eureka)
+          predicates:
+            - Path=/api/cars/all  # Only this path is open for everyone (no authentication)
+          filters:
+            - SetPath=/api/cars/all
+
+        # Route for CarService (secured access for creating, deleting, and updating cars)
+        - id: car-service
+          uri: http://localhost:8081  # Direct URL to the CarService
+          predicates:
+            - Path=/api/cars/**  # All other routes under /api/cars need authentication
+#          filters:
+#            - SetPath=/api/cars
+
+        # Route for Customer Service (secured)
+        - id: customer-service
+          uri: http://localhost:8082  # Direct URL to the CustomerService
+          predicates:
+            - Path=/api/customers/**  # All routes under /api/customers need authentication
+#          filters:
+#            - SetPath=/api/customers
+
+        # Route for Car Hire Service (secured)
+        - id: car-hire-service
+          uri: http://localhost:8083  # Direct URL to the CarHireService
+          predicates:
+            - Path=/api/carhires/**  # All routes under /api/carhires need authentication
+#          filters:
+#            - SetPath=/api/carhires
+
+        # Identity service for OAuth2 login and authentication (public)
+        - id: identity-service
+          uri: http://localhost:8085  # Direct URL to the IdentityService (e.g., Keycloak)
+          predicates:
+            - Path=/auth/**  # Authentication and authorization service
+          filters:
+            - SetPath=/auth
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8085/realms/car-rental  # This should be your Keycloak server URI
+
