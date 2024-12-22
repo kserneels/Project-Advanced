@@ -31,7 +31,7 @@ services:
       - MongoCar
     image: kenzos/car-service
     ports:
-      - 8081:8081
+      - 8081:8084
     environment:
       MONGODB_HOST: MongoCar
       MONGODB_PORT: 27017
@@ -41,7 +41,7 @@ services:
       - MysqlCustomer
     image: kenzos/customer-service
     ports:
-      - 8082:8082
+      - 8082:8084
     environment:
       MYSQL_DB_HOST: MysqlCustomer
       MYSQL_DB_PORT: 3306
@@ -52,7 +52,7 @@ services:
       - customer-service
     image: kenzos/carhire-service
     ports:
-      - 8083:8083
+      - 8083:8084
     environment:
       CAR_SERVICE_BASEURL: car-service:8081
       CUSTOMER_INFO_SERVICE_BASEURL: customer-service:8082
