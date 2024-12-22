@@ -80,7 +80,9 @@ services:
       - "8085:8085"
     volumes:
       - keycloak_data:/opt/keycloak/data
+      - ./keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json  # Volume mapping for realm-import
     restart: unless-stopped
+    command: [ "kc.sh", "start", "--import-realm" ]  # Start Keycloak with realm import
 
 volumes:
   mongodb_cars_data:
