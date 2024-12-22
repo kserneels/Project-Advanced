@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   MongoCar:
     image: mongo:latest
@@ -51,7 +49,7 @@ services:
   carhire-service:
     depends_on:
       - car-service
-      - customer-servicegit a
+      - customer-service
     image: kenzos/carhire-service
     ports:
       - 8083:8083
