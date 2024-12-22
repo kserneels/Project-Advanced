@@ -121,7 +121,6 @@ jobs:
             -e KC_HTTP_PORT=8085 \
             -v $HOME/secrets/realm-export.json:/opt/keycloak/data/import/realm-export.json \
             ${{ secrets.DOCKER_USER }}/keycloak:latest
-
   # API Gateway Job
   apigateway:
     runs-on: ubuntu-latest
