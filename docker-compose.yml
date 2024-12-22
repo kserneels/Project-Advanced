@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   # MongoDB container voor Car Service
   MongoCar:
@@ -35,7 +37,7 @@ services:
     ports:
       - 8081:8081
     links:
-      -MongoCar
+      - MongoCar
     environment:
       MONGODB_HOST: MongoCar
       MONGODB_PORT: 27017
@@ -81,9 +83,9 @@ services:
     links:
       - car-service
       - carhire-service
-#    environment:
-#      CAR_SERVICE_BASEURL: car-service:8081
-#      CARHIRE_SERVICE_BASEURL: carhire-service:8083
+    environment:
+      - WAIT_HOSTS=MysqlCarHire:3306,MysqlCustomer:3306
+    entrypoint: ["./wait-for-it.sh", "MysqlCarHire:3306", "MysqlCustomer:3306", "--", "command-to-start-your-service"]
 
   # Keycloak voor authenticatie
   keycloak:
