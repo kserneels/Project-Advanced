@@ -41,10 +41,12 @@ services:
       - MysqlCustomer
     image: kenzos/customer-service
     ports:
-      - 8082:8084
+      - 8082:8082
     environment:
       MYSQL_DB_HOST: MysqlCustomer
-      MYSQL_DB_PORT: 3306
+      MYSQL_DB_USERNAME: root
+      MYSQL_DB_PASSWORD: abc123
+      MYSQL_DB_PORT: 3307
 
   carhire-service:
     depends_on:
@@ -52,14 +54,14 @@ services:
       - customer-service
     image: kenzos/carhire-service
     ports:
-      - 8083:8084
+      - 8083:8083
     environment:
       CAR_SERVICE_BASEURL: car-service:8081
       CUSTOMER_INFO_SERVICE_BASEURL: customer-service:8082
       MYSQL_DBUSERNAME: root
       MYSQL_DB_PASSWORD: abc123
       MYSQL_DB_HOST: MysqlCarHire
-      MYSQL_DB_PORT: 3306
+      MYSQL_DB_PORT: 3308
 
   api-gateway:
     depends_on:
