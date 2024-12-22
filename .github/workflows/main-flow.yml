@@ -87,7 +87,6 @@ jobs:
       - name: Upload container to Docker Hub with Push
         run: docker push ${{ secrets.DOCKER_USER }}/carhire-service:latest
 
-  # Keycloak Job (with realm import)
   keycloak:
     runs-on: ubuntu-latest
     name: Build, test, deliver keycloak container
@@ -110,7 +109,8 @@ jobs:
             -e KC_BOOTSTRAP_ADMIN_USERNAME=admin \
             -e KC_BOOTSTRAP_ADMIN_PASSWORD=admin \
             -v $PWD/keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json \
-            ${{ secrets.DOCKER_USER }}/keycloak:latest
+            ${{ secrets.DOCKER_USER }}/keycloak:latest start --import-realm
+      
       
 
       # API Gateway Job

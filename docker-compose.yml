@@ -77,12 +77,13 @@ services:
       KEYCLOAK_USER: admin
       KEYCLOAK_PASSWORD: admin
     ports:
-      - "8085:8085"
+      - "8085:8085"  # Map host port 8085 to container port 8085
     volumes:
       - keycloak_data:/opt/keycloak/data
       - ./keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json  # Correct volume mapping
     restart: unless-stopped
-    command: [ "kc.sh", "start", "--import-realm" ]  # Start Keycloak with realm import
+    command: [ "start", "--import-realm" ]  # Start Keycloak with realm import
+
 
 
 volumes:
