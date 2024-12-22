@@ -113,8 +113,6 @@ jobs:
             -v $PWD/keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json \
             ${{ secrets.DOCKER_USER }}/keycloak:latest \
             kc.sh start --import-realm
-      
-      
 
       # API Gateway Job
   apigateway:
