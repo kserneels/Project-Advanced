@@ -109,10 +109,9 @@ jobs:
           docker run -d -p 8085:8085 \
             -e KC_BOOTSTRAP_ADMIN_USERNAME=admin \
             -e KC_BOOTSTRAP_ADMIN_PASSWORD=admin \
-            -e KC_HTTP_PORT=8085 \
             -v $PWD/keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json \
-            ${{ secrets.DOCKER_USER }}/keycloak:latest \
-            kc.sh start --import-realm
+            ${{ secrets.DOCKER_USER }}/keycloak:latest
+      
 
       # API Gateway Job
   apigateway:

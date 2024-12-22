@@ -12,5 +12,5 @@ COPY ./realm-export.json /opt/keycloak/data/import/realm-export.json
 # Expose the port
 EXPOSE 8085
 
-# Start Keycloak in development mode
-ENTRYPOINT ["/opt/keycloak/bin/kc.sh", "start-dev", "--http-port=8085"]
+# Correct the command: No need to repeat kc.sh
+ENTRYPOINT ["/opt/keycloak/bin/kc.sh", "start-dev", "--http-port=8085", "--import-realm"]
