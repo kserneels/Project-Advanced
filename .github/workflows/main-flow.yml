@@ -3,9 +3,10 @@ name: Build and deliver containers
 on: push
 
 jobs:
+  # Car Service Job
   carservice:
     runs-on: ubuntu-latest
-    name: Java 17 build, test, deliver product-service container
+    name: Java 17 build, test, deliver car-service container
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
@@ -29,6 +30,8 @@ jobs:
 
       - name: Upload container to Docker Hub with Push
         run: docker push ${{ secrets.DOCKER_USER }}/car-service:latest
+
+  # Customer Service Job
   customerservice:
     runs-on: ubuntu-latest
     name: Java 17 build, test, deliver customer-service container
@@ -55,6 +58,8 @@ jobs:
 
       - name: Upload container to Docker Hub with Push
         run: docker push ${{ secrets.DOCKER_USER }}/customer-service:latest
+
+  # Car Hire Service Job
   carhireservice:
     runs-on: ubuntu-latest
     name: Java 17 build, test, deliver carhire-service container
@@ -82,6 +87,7 @@ jobs:
       - name: Upload container to Docker Hub with Push
         run: docker push ${{ secrets.DOCKER_USER }}/carhire-service:latest
 
+  # Keycloak Job (with realm import)
   keycloak:
     runs-on: ubuntu-latest
     name: Build, test, deliver keycloak container
@@ -92,12 +98,31 @@ jobs:
       - name: Docker login
         run: docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASSWORD }}
 
+      - name: Merge Keycloak Realm JSON files (if split into multiple secrets)
+        run: |
+          mkdir -p $HOME/secrets
+          echo "${{ secrets.REALM_PART_1 }}" > $HOME/secrets/REALM_PART_1.json
+          echo "${{ secrets.REALM_PART_2 }}" > $HOME/secrets/REALM_PART_2.json
+          echo "${{ secrets.REALM_PART_3 }}" > $HOME/secrets/REALM_PART_3.json
+          echo "${{ secrets.REALM_PART_4 }}" > $HOME/secrets/REALM_PART_4.json
+          cat $HOME/secrets/REALM_PART_* > $HOME/secrets/realm-export.json
+
       - name: Docker Build
         run: docker build -t ${{ secrets.DOCKER_USER }}/keycloak:latest ./keycloak
 
       - name: Upload container to Docker Hub with Push
         run: docker push ${{ secrets.DOCKER_USER }}/keycloak:latest
 
+      - name: Run Keycloak Container with Custom Settings
+        run: |
+          docker run -d -p 8085:8085 \
+            -e KC_BOOTSTRAP_ADMIN_USERNAME=admin \
+            -e KC_BOOTSTRAP_ADMIN_PASSWORD=admin \
+            -e KC_HTTP_PORT=8085 \
+            -v $HOME/secrets/realm-export.json:/opt/keycloak/data/import/realm-export.json \
+            ${{ secrets.DOCKER_USER }}/keycloak:latest
+
+  # API Gateway Job
   apigateway:
     runs-on: ubuntu-latest
     name: Java 17 build, test, deliver api-gateway container
