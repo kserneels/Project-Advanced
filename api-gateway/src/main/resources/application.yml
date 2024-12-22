@@ -18,7 +18,7 @@ spring:
       routes:
         # Route for Cars service (public access for all cars)
         - id: car-service-all
-          uri: http://project-advanced-car-service-1:8081  # Use the container name for the CarService
+          uri: http://localhost:8081  # Use the container name for the CarService
           predicates:
             - Path=/api/cars/all  # Only this path is open for everyone (no authentication)
           filters:
@@ -26,25 +26,25 @@ spring:
 
         # Route for CarService (secured access for creating, deleting, and updating cars)
         - id: car-service
-          uri: http://project-advanced-car-service-1:8081  # Use the container name for the CarService
+          uri: http://localhost:8081  # Use the container name for the CarService
           predicates:
             - Path=/api/cars/**  # All other routes under /api/cars need authentication
 
         # Route for Customer Service (secured)
         - id: customer-service
-          uri: http://project-advanced-customer-service-1:8082  # Use the container name for the CustomerService
+          uri: http://localhost:8082  # Use the container name for the CustomerService
           predicates:
             - Path=/api/customers/**  # All routes under /api/customers need authentication
 
         # Route for Car Hire Service (secured)
         - id: car-hire-service
-          uri: http://project-advanced-carhire-service-1:8083  # Use the container name for the CarHireService
+          uri: http://localhost:8083  # Use the container name for the CarHireService
           predicates:
             - Path=/api/carhires/**  # All routes under /api/carhires need authentication
 
         # Identity service for OAuth2 login and authentication (public)
         - id: identity-service
-          uri: http://project-advanced-keycloak-1:8080  # Use the container name for the IdentityService
+          uri: http://localhost:8085  # Use the container name for the IdentityService
           predicates:
             - Path=/auth/**  # Authentication and authorization service
           filters:
@@ -54,5 +54,4 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:8085/realms/car-rental
-          # Identity service URI using container name
+          issuer-uri: http://localhost:8085/realms/car-rental  # Identity service URI using container name

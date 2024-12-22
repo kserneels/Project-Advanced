@@ -65,7 +65,7 @@ services:
       - 8083:8083
     environment:
       CAR_SERVICE_BASEURL: car-service:8081
-      CUSTOMER_INFO_SERVICE_BASEURL: customer-service:8082
+      CUSTOMER_SERVICE_BASEURL: customer-service:8082
       MYSQL_DBUSERNAME: root
       MYSQL_DB_PASSWORD: abc123
       MYSQL_DB_HOST: MysqlCarHire
@@ -76,12 +76,15 @@ services:
   api-gateway:
     depends_on:
       - car-service
+      - customer-service
       - carhire-service
     image: kenzos/api-gateway
     ports:
       - 8084:8084
     environment:
-      - WAIT_HOSTS=MysqlCarHire:3306,MysqlCustomer:3306
+      CARHIRE_SERVICE_BASEURL: carhire-service:8083
+      CAR_SERVICE_BASEURL: car-service:8081
+      CUSTOMER_SERVICE_BASEURL: customer-service:8082
     networks:
       - gateway-network
 
