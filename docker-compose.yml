@@ -72,17 +72,18 @@ services:
       - WAIT_HOSTS=MysqlCarHire:3306,MysqlCustomer:3306
 
   keycloak:
-    image: kenzos/keycloak:latest
+    image: kenzos/keycloak:latest  # Use the image pushed to Docker Hub
     environment:
-      KEYCLOAK_USER: admin
-      KEYCLOAK_PASSWORD: admin
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
     ports:
       - "8085:8085"  # Map host port 8085 to container port 8085
     volumes:
       - keycloak_data:/opt/keycloak/data
       - ./keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json  # Correct volume mapping
     restart: unless-stopped
-    command: [ "start", "--import-realm" ]  # Start Keycloak with realm import
+    command: [ "start-dev", "--import-realm" ]  # Start Keycloak in dev mode with realm import
+
 
 
 

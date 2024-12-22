@@ -109,7 +109,7 @@ jobs:
             -e KC_BOOTSTRAP_ADMIN_USERNAME=admin \
             -e KC_BOOTSTRAP_ADMIN_PASSWORD=admin \
             -v $PWD/keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json \
-            ${{ secrets.DOCKER_USER }}/keycloak:latest start --import-realm
+            ${{ secrets.DOCKER_USER }}/keycloak:latest start-dev --import-realm
       
       
 
