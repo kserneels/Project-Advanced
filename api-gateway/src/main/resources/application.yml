@@ -44,7 +44,7 @@ spring:
 
         # Identity service for OAuth2 login and authentication (public)
         - id: identity-service
-          uri: http://project-advanced-keycloak-1:8085  # Use the container name for the IdentityService
+          uri: http://project-advanced-keycloak-1:8080  # Use the container name for the IdentityService
           predicates:
             - Path=/auth/**  # Authentication and authorization service
           filters:
@@ -54,4 +54,4 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://project-advanced-keycloak-1:8080/realms/car-rental  # Identity service URI using container name
+          issuer-uri: http://localhost:8085/realms/car-rental  # Identity service URI using container name
