@@ -104,9 +104,16 @@ jobs:
       - name: Upload container to Docker Hub with Push
         run: docker push ${{ secrets.DOCKER_USER }}/keycloak:latest
 
-      # You could also add a step to deploy locally using Docker Compose if needed:
-      # - name: Run Keycloak with Docker Compose locally (optional)
-      #   run: docker-compose -f docker-compose.yml up -d keycloak
+      - name: Run Keycloak Container with Realm Import
+        run: |
+          docker run -d -p 8085:8085 \
+            -e KC_BOOTSTRAP_ADMIN_USERNAME=admin \
+            -e KC_BOOTSTRAP_ADMIN_PASSWORD=admin \
+            -e KC_HTTP_PORT=8085 \
+            -v $PWD/keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json \
+            ${{ secrets.DOCKER_USER }}/keycloak:latest \
+            kc.sh start --import-realm
+      
       
 
       # API Gateway Job
